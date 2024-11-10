@@ -1,0 +1,2 @@
+fsm.c:14:6:HAL_UART_RxCpltCallback	16	static
+fsm.c:29:6:check_timeout	8	static

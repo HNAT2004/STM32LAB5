@@ -6,26 +6,29 @@
  */
 #include "fsm.h"
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	if(huart->Instance == USART2){
-		if(rx_idx == 0){
-			for (int i = 0; i < 100; i++){
-				rx_buffer[i] = 0;
-			}
-			HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
-		}
-		if (rx_data[0] != 13){
-			rx_buffer[rx_idx++] = rx_data[0];
-		}else{
-			rx_idx = 0;
-			transfer_cplt = 1;
-			HAL_UART_Transmit(&huart2, "\n\r", 2, 100);
-			if (!strcmp(rx_buffer, "LED ON")){
-				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
-			}
-		}
+UART_HandleTypeDef huart2;
+char rx_buffer[10];
+char tx_buffer[20];
+uint16_t ADC_value = 1234;
 
-		HAL_UART_Receive_IT(&huart2, rx_data, 1);
-		HAL_UART_Transmit(&huart2, rx_data, strlen(rx_data), 100);
-	}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+    if (huart->Instance == USART2){
+        if (strcmp(rx_buffer, "!RST#") == 0){
+            sprintf(tx_buffer, "!ADC=%d#", ADC_value);
+            HAL_UART_Transmit(&huart2,(uint8_t*)tx_buffer, strlen(tx_buffer), HAL_MAX_DELAY);
+        }else if (strcmp(rx_buffer, "!OK#") == 0){
+            HAL_UART_Transmit(&huart2, (uint8_t*)"Communication Ended#", 20, HAL_MAX_DELAY);
+        }
+        HAL_UART_Receive_IT(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer) - 1);
+    }
+}
+
+uint32_t timeout_start = 0;
+uint8_t wait_for_ok = 0;
+
+void check_timeout(void){
+    if (wait_for_ok && (HAL_GetTick() - timeout_start > 3000)){
+        HAL_UART_Transmit(&huart2, (uint8_t*)tx_buffer, strlen(tx_buffer), HAL_MAX_DELAY);
+        timeout_start = HAL_GetTick();
+    }
 }
