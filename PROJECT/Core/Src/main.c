@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -66,7 +67,27 @@ static void MX_USART2_UART_Init(void);
 uint8_t temp = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	HAL_UART_Transmit(&huart2, rx_data, 6, 10);
+	if(huart->Instance == USART2){
+		if(rx_idx == 0){
+			for (int i = 0; i < 100; i++){
+				rx_buffer[i] = 0;
+			}
+			HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+		}
+		if (rx_data[0] != 13){
+			rx_buffer[rx_idx++] = rx_data[0];
+		}else{
+			rx_idx = 0;
+			transfer_cplt = 1;
+			HAL_UART_Transmit(&huart2, "\n\r", 2, 100);
+			if (!strcmp(rx_buffer, "LED ON")){
+				HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+			}
+		}
+
+		HAL_UART_Receive_IT(&huart2, rx_data, 1);
+		HAL_UART_Transmit(&huart2, rx_data, strlen(rx_data), 100);
+	}
 }
 /* USER CODE END 0 */
 
@@ -101,7 +122,7 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, rx_data, 6);
+  HAL_UART_Receive_IT(&huart2, rx_data, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,10 +130,10 @@ int main(void)
   uint32_t ADC_value = 0;
   while (1)
   {
-	  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-	  ADC_value = HAL_ADC_GetValue(&hadc1);
-	  HAL_UART_Transmit(&huart2, tx_buffer, 27, 10);
-	  HAL_Delay(500);
+//	  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+//	  ADC_value = HAL_ADC_GetValue(&hadc1);
+//	  HAL_UART_Transmit(&huart2, tx_buffer, 27, 10);
+//	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
