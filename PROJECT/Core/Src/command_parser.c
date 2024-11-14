@@ -49,7 +49,7 @@ void uart_communication_fsm(){
 	static char str[50];
 	if(timer1_flag == 1){
 		ADC_value = HAL_ADC_GetValue(&hadc1);
-		sprintf(str, "\r\n!ADC=%lu#", ADC_value);
+		sprintf(str, "\r\n!ADC=%d#", (int)ADC_value);
 		HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 1000);
 		setTimer1(300);
 	}

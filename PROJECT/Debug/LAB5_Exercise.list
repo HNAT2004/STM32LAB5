@@ -261,7 +261,7 @@ void uart_communication_fsm(){
  800027e:	4603      	mov	r3, r0
  8000280:	4a0e      	ldr	r2, [pc, #56]	; (80002bc <uart_communication_fsm+0x50>)
  8000282:	6013      	str	r3, [r2, #0]
-		sprintf(str, "\r\n!ADC=%lu#", ADC_value);
+		sprintf(str, "\r\n!ADC=%d#", (int)ADC_value);
  8000284:	4b0d      	ldr	r3, [pc, #52]	; (80002bc <uart_communication_fsm+0x50>)
  8000286:	681b      	ldr	r3, [r3, #0]
  8000288:	461a      	mov	r2, r3
