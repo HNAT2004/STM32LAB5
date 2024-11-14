@@ -101,7 +101,6 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-//  HAL_UART_Receive_IT(&huart2, (uint8_t*)rx_buffer, sizeof(rx_buffer) - 1);
   HAL_UART_Receive_IT(&huart2, &temp, 1);
   uint32_t ADC_value = 0;
   char str[50];
