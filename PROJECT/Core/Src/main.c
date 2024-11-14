@@ -20,6 +20,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stdio.h"
+#include "software_timer.h"
+#include "command_parser.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -102,8 +104,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, &temp, 1);
-  uint32_t ADC_value = 0;
-  char str[50];
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,10 +114,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-	  ADC_value = HAL_ADC_GetValue(&hadc1);
-	  HAL_UART_Transmit(&huart2, (void *)str, sprintf(str, "%d\n", (int)ADC_value), 1000);
-	  HAL_Delay(500);
+	  if (buffer_flag == 1){
+		  command_parser_fsm();
+		  buffer_flag = 0;
+	  }
+	  uart_communication_fsm();
   }
   /* USER CODE END 3 */
 }
