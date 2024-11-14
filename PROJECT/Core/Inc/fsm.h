@@ -23,7 +23,7 @@ extern uint8_t wait_for_ok;
 UART_HandleTypeDef huart2;
 extern uint16_t ADC_value;
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 void check_timeout(void);
 
 #endif /* INC_FSM_H_ */
